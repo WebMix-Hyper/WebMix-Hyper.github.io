@@ -1,0 +1,5 @@
+.DS_Store
+
+# Local artwork, generation prompts, and preview screenshots.
+# The published animation embeds all of its artwork and its pixel font.
+assets/
