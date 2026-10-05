@@ -6,12 +6,13 @@
 
   <iframe src="webmix-animation.html?embed=1"
     title="WebMix: Scout, Hypernetwork, and upgraded Web Agent"
-    style="display:block;width:100%;height:auto;aspect-ratio:2/3;border:0">
+    style="display:block;width:100%;height:min(680px,95svh);border:0">
   </iframe>
 
   ?embed=1 uses a transparent background with no surrounding padding.
-  The story runs for 38.5 seconds and loops. &at=32&paused=1 previews a story moment.
-  &controls=0 hides the pause button. &paused=1 starts paused.
+  The story spans 38.5 seconds, playing at 1.25x by default (a 30.8-second loop).
+  The speed button cycles through 1.25x, 2x, and 4x.
+  &at=32&paused=1 previews a story moment; &controls=0 hides the controls.
   Color and example coefficient settings are in the adapters array below.
   The coefficients are illustrative, not measured model parameters.
 -->
@@ -128,15 +129,15 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     :root { --paper: #fafbf8; --ink: #233f43; --muted: #718281; --teal: #27999d; }
     * { box-sizing: border-box; }
     body { margin: 0; min-height: 100svh; display: grid; place-items: center; background: var(--paper); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    .webmix { width: min(1160px, 100%); padding: 18px 20px; position: relative; }
+    .webmix { width: min(1440px, 100%); padding: 12px 20px; position: relative; }
     .intro { text-align: center; }
     .eyebrow { display: inline-flex; align-items: center; gap: 9px; font-size: 11px; font-weight: 750; letter-spacing: .22em; text-transform: uppercase; }
     .eyebrow svg { width: 21px; height: 21px; }
     h1 { margin: 16px 0 11px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(30px, 4.4vw, 52px); font-weight: 400; letter-spacing: -.045em; line-height: 1.1; }
     h1 em { font-weight: 400; color: #338b88; }
     .intro p { color: var(--muted); font-size: 14px; margin: 0; letter-spacing: .015em; }
-    .stage { position: relative; margin: 0 auto; }
-    #scene { display: block; width: 100%; height: auto; overflow: visible; }
+    .stage { position: relative; margin: 0 auto; height: calc(100svh - 24px); padding-top: 56px; }
+    #scene { display: block; width: 100%; height: 100%; }
     #scene image { image-rendering: pixelated; }
     /* Each character keeps a crisp pixel grid, including its moving limbs. */
     #scene use { image-rendering: pixelated; }
@@ -155,27 +156,26 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     .thin { stroke: #536762; stroke-width: 1.25; stroke-linecap: round; fill: none; }
     .footer { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--muted); font-size: 12px; margin: 20px 0 0; }
     .footer .dot { width: 5px; height: 5px; border-radius: 50%; background: #72a395; }
-    .controls { position: absolute; right: 20px; bottom: 2px; display: flex; gap: 8px; }
+    .controls { position: absolute; right: 12px; top: 10px; display: flex; gap: 8px; }
     button { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid #dce5df; border-radius: 50%; color: #65807a; background: #ffffffb8; cursor: pointer; transition: background .15s, color .15s; }
     button:hover { background: #e8efea; color: var(--ink); }
     button:focus-visible { outline: 3px solid #299b9c; outline-offset: 4px; }
     button svg { width: 14px; height: 14px; }
+    #speed-toggle { width: 68px; border-radius: 18px; font: 600 14px/1 system-ui, sans-serif; font-variant-numeric: tabular-nums; }
     .play-icon { display: none; }
     button[data-paused="true"] .pause-icon { display: none; }
     button[data-paused="true"] .play-icon { display: block; }
     .embed body { background: transparent; min-height: 0; display: block; }
     .embed .webmix { width: 100%; max-width: none; padding: 0; }
     .embed .intro, .embed .footer { display: none; }
-    .embed .stage { margin: 0; }
-    .embed .controls { right: 12px; bottom: 12px; }
+    .embed .stage { margin: 0; height: 100svh; }
     .no-controls .controls { display: none; }
+    .no-controls .stage { padding-top: 0; }
     @media (max-width: 600px) {
-      .webmix { padding: 10px 8px; }
+      .webmix { padding: 12px 8px; }
       .intro p { font-size: 12px; }
       .stage { margin-top: 0; }
       .footer { font-size: 10px; gap: 8px; margin-top: 14px; }
-      .controls { right: 4px; bottom: 0; }
-      button { width: 30px; height: 30px; }
     }
   </style>
 </head>
@@ -248,7 +248,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         </defs>
 
         <!-- TOP PANEL: the Scout's round trip to the web domain. -->
-        <text x="580" y="-300" class="scene-heading">The Scout explores a web domain and creates a manual.</text>
+        <g id="scout-stage">
+        <text id="scout-heading" x="580" y="-300" class="scene-heading">The Scout explores a web domain and creates a manual.</text>
         <g id="scout-panel">
           <path d="M168 0H1000" stroke="#dce5dc" stroke-width="1.3"/>
           <path d="M172 34H996" stroke="#dce5dc" stroke-width="1" stroke-dasharray="3 8" opacity=".65"/>
@@ -287,9 +288,10 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <text x="300" y="23" text-anchor="middle" class="scene-text" font-size="11" font-weight="600" letter-spacing="1.5" fill="#6c8378">SCOUT</text>
           <text x="870" y="-15" text-anchor="middle" class="scene-text" font-size="11" font-weight="600" letter-spacing="1.5" fill="#6c8378">WEB DOMAIN</text>
         </g>
-        <path id="recipe-handoff-route" d="M381-108C465 15 523 206 483 335" fill="none" stroke="#abbd9c" stroke-width="2" stroke-dasharray="4 8" opacity="0"/>
+        </g>
 
-        <text x="580" y="72" class="scene-heading">The Hypernetwork mixes LoRA adapters based on the manual.</text>
+        <g id="hyper-stage">
+        <text id="hyper-heading" x="580" y="72" class="scene-heading">The Hypernetwork mixes LoRA adapters based on the manual.</text>
 
         <!-- Soft atmosphere and a shared ground plane. All artwork is inline. -->
         <ellipse cx="563" cy="375" rx="340" ry="198" fill="url(#halo)"/>
@@ -325,17 +327,6 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
         <!-- One scroll travels from the browser to Scout's mouth, then to the Hypernetwork. -->
         <ellipse id="recipe-rest-shadow" cx="463" cy="545" rx="16" ry="2" fill="#687359" opacity="0"/>
-        <g id="recipe-scroll" opacity="0">
-          <g id="recipe-closed"><use href="#rolled-recipe-art"/></g>
-          <g id="recipe-open" opacity="0">
-            <use href="#open-recipe-art"/>
-            <rect id="recipe-reading-line" x="-27" y="-14" width="53" height="3" fill="#37bad0" opacity="0"/>
-          </g>
-        </g>
-        <!-- The near edge of the muzzle overlaps the roll so Scout visibly bites it. -->
-        <g id="scout-mouth-grip" opacity="0">
-          <use href="#scout-art" clip-path="url(#scout-muzzle-clip)"/>
-        </g>
 
         <!-- The pot uses a coarser pixel grid with stepped shading to match the uploaded mascot. -->
         <g id="pot-back">
@@ -380,11 +371,13 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <g text-anchor="middle">
           <text id="hypernetwork-label" x="338" y="574" class="scene-text" font-size="11" font-weight="600" letter-spacing="1.5" fill="#6c8378">HYPERNETWORK</text>
         </g>
+        </g>
 
         <!-- THIRD PANEL: the mixed adapter becomes a visible upgrade for the Web Agent. -->
+        <g id="agent-stage">
         <g id="agent-panel">
-          <path d="M172 624H996" stroke="#dce5dc" stroke-width="1" stroke-dasharray="3 8"/>
-          <text x="580" y="675" class="scene-heading">The Web Agent adapts using the mixed LoRA adapter.</text>
+          <path id="agent-divider" d="M172 624H996" stroke="#dce5dc" stroke-width="1" stroke-dasharray="3 8"/>
+          <text id="agent-heading" x="580" y="675" class="scene-heading">The Web Agent adapts using the mixed LoRA adapter.</text>
           <ellipse cx="566" cy="844" rx="355" ry="167" fill="url(#halo)" opacity=".65"/>
           <path d="M168 1006H1000" stroke="#dce5dc" stroke-width="1.3"/>
           <g id="agent-domain-halo" opacity="0" shape-rendering="crispEdges">
@@ -474,6 +467,21 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <text x="330" y="1032" text-anchor="middle" class="scene-text" font-size="11" font-weight="600" letter-spacing="1.5" fill="#6c8378">WEB AGENT</text>
           <text x="870" y="1020" text-anchor="middle" class="scene-text" font-size="11" font-weight="600" letter-spacing="1.5" fill="#6c8378">WEB DOMAIN</text>
         </g>
+        </g>
+        <!-- Shared objects travel between panels in either responsive layout. -->
+        <path id="recipe-handoff-route" d="M381-108C465 15 523 206 483 335" fill="none" stroke="#abbd9c" stroke-width="2" stroke-dasharray="4 8" opacity="0"/>
+        <g id="recipe-scroll" opacity="0">
+          <g id="recipe-closed"><use href="#rolled-recipe-art"/></g>
+          <g id="recipe-open" opacity="0">
+            <use href="#open-recipe-art"/>
+            <rect id="recipe-reading-line" x="-27" y="-14" width="53" height="3" fill="#37bad0" opacity="0"/>
+          </g>
+        </g>
+        <g id="scout-mouth-stage">
+          <g id="scout-mouth-grip" opacity="0">
+            <use href="#scout-art" clip-path="url(#scout-muzzle-clip)"/>
+          </g>
+        </g>
         <path id="module-handoff-route" d="M646 370C850 382 867 582 734 635S490 725 419 889" fill="none" stroke="#7bb9b1" stroke-width="2" stroke-dasharray="4 9" opacity="0"/>
         <g id="mixed-module" opacity="0" shape-rendering="crispEdges">
           <path d="M-16-28H16V-24H24V24H16V28H-16V24H-24V-24H-16Z" fill="#243e55"/>
@@ -488,6 +496,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         </g>
       </svg>
       <div class="controls">
+        <button id="speed-toggle" type="button" aria-label="Playback speed: 1.25×. Change to 2×" title="Playback speed: 1.25×. Change to 2×">1.25×</button>
         <button id="story-replay" type="button" aria-label="Replay the Scout story" title="Replay the Scout story">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 4a5 5 0 1 1-1 5M4 1v4H0"/></svg>
         </button>
@@ -504,7 +513,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   (() => {
     'use strict';
     // Embedding: webmix-animation.html?embed=1
-    // Optional: &controls=0 (hide the pause button), &paused=1 (start still).
+    // Optional: &controls=0 (hide the controls), &paused=1 (start still).
     const params = new URLSearchParams(location.search);
     document.documentElement.classList.toggle('embed', params.get('embed') === '1');
     document.documentElement.classList.toggle('no-controls', params.get('controls') === '0');
@@ -525,6 +534,10 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     const ease = value => { const u = clamp(value); return u * u * (3 - 2 * u); };
     const lerp = (a, b, u) => a + (b - a) * u;
     const lastStoryState = { phase: '' };
+    const wideLayout = matchMedia('(min-width: 960px)');
+    const stageOffsets = { scout: [0, 610], hyper: [960, 60], agent: [1920, -400] };
+    const stagePoint = (stage, point) => point.map((value, i) => value + (wideLayout.matches ? stageOffsets[stage][i] : 0));
+    const widePaperRoute = [[381, 502], [720, 230], [1323, 215], [1443, 395]];
     const PIXEL = 4;
     const POT_PIXEL = 5;
     const CHARACTER_PIXEL = 4;
@@ -888,6 +901,11 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         paperOpacity = state.ending; unfold = 1 - ease((p - 13.8) / .45);
       }
       const carried = p >= 5.9 && p < 10.1;
+      if (wideLayout.matches) {
+        [paperX, paperY] = p < 10.1 ? stagePoint('scout', [paperX, paperY])
+          : p < 11.5 ? cubic(...widePaperRoute, ease((p - 10.1) / 1.4))
+          : stagePoint('hyper', [paperX, paperY]);
+      }
       set($('recipe-scroll'), {transform: `translate(${carried ? paperX : snapCharacter(paperX)} ${carried ? paperY : snapCharacter(paperY)}) rotate(${Math.round(paperAngle / 15) * 15}) scale(${paperScale})`, opacity: paperOpacity});
       set($('scout-mouth-grip'), {
         transform: `translate(${dogX} ${-216 + bob}) scale(${direction} 1) translate(-110 0) scale(.1754386)`,
@@ -928,7 +946,37 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     const moduleStart = [handoffPalm[0]-1, handoffPalm[1]-20];
     const agentPalm = [AGENT_ORIGIN[0]+1023*AGENT_SCALE, AGENT_ORIGIN[1]+881*AGENT_SCALE-20];
     const agentCore = [AGENT_ORIGIN[0]+560*AGENT_SCALE, AGENT_ORIGIN[1]+824*AGENT_SCALE];
-    set($('module-handoff-route'), {d:`M${moduleStart}C523 450 486 490 484 556C486 650 440 734 ${agentPalm}`});
+    const wideModuleStart = moduleStart.map((value, i) => value + stageOffsets.hyper[i]);
+    const wideModuleEnd = agentPalm.map((value, i) => value + stageOffsets.agent[i]);
+    const wideModuleRoute = [wideModuleStart, [wideModuleStart[0]+220, wideModuleStart[1]-160], [wideModuleEnd[0]-220, wideModuleEnd[1]-160], wideModuleEnd];
+    const headingLayouts = [
+      {stage:'scout', y:-300, wideY:-546, lines:['1. The Scout explores', 'and writes a manual.']},
+      {stage:'hyper', y:72, wideY:4, lines:['2. The Hypernetwork mixes', 'LoRA adapters from the manual.']},
+      {stage:'agent', y:675, wideY:464, lines:['3. The Web Agent adapts', 'and completes the task.']}
+    ].map(heading => ({...heading, text:$(`${heading.stage}-heading`).textContent}));
+
+    function updateLayout() {
+      const wide = wideLayout.matches;
+      set($('scene'), {viewBox:wide ? '100 0 2880 720' : '100 -360 960 1440'});
+      $('scene').dataset.layout = wide ? 'wide' : 'stacked';
+      for (const [stage, offset] of Object.entries(stageOffsets)) {
+        set($(`${stage}-stage`), {transform:wide ? `translate(${offset})` : ''});
+      }
+      set($('scout-mouth-stage'), {transform:wide ? `translate(${stageOffsets.scout})` : ''});
+      set($('agent-divider'), {opacity:wide ? 0 : 1});
+      for (const heading of headingLayouts) {
+        const el = $(`${heading.stage}-heading`);
+        set(el, {y:wide ? heading.wideY : heading.y});
+        el.style.fontSize = wide ? '54px' : '';
+        el.replaceChildren();
+        if (wide) heading.lines.forEach((line, i) => {
+          make('tspan', {x:580, dy:i ? 58 : 0}, el).textContent = line;
+        });
+        else el.textContent = heading.text;
+      }
+      set($('recipe-handoff-route'), {d:wide ? `M${widePaperRoute[0]}C${widePaperRoute.slice(1).join(' ')}` : 'M381-108C465 15 523 206 483 335'});
+      set($('module-handoff-route'), {d:wide ? `M${wideModuleRoute[0]}C${wideModuleRoute.slice(1).join(' ')}` : `M${moduleStart}C523 450 486 490 484 556C486 650 440 734 ${agentPalm}`});
+    }
 
     function drawFinalAct(story, palm) {
       const p=story.p;
@@ -1005,6 +1053,11 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       } else if(p>=30.1&&p<30.5) {
         position=agentCore;scale=.42;opacity=1-ease((p-30.1)/.4);owner='integrated';
       } else if(p>=30.5&&p<AGENT_RESET) owner='integrated';
+      if (wideLayout.matches) {
+        position = p < 26.3 ? stagePoint('hyper', position)
+          : p < 28.5 ? cubic(...wideModuleRoute, ease((p-26.3)/2.2))
+          : stagePoint('agent', position);
+      }
       set($('mixed-module'), {transform:`translate(${snap(position[0])} ${snap(position[1])}) scale(${scale})`,opacity});
       $('mixed-module').dataset.owner=owner;
       set($('module-handoff-route'), {opacity:p>=26.3&&p<28.5?Math.sin((p-26.3)/2.2*Math.PI)*.6:0});
@@ -1083,9 +1136,20 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     }
 
     const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+    const playbackRates = [1.25, 2, 4];
+    let playbackRateIndex = 0;
     let paused = motionPreference.matches || params.get('paused') === '1';
     let visible = true, frame = null, time = Math.max(0, Number(params.get('at')) || 0) % STORY_DURATION, previous = null, lastSpriteFrame = -1;
     const button = $('motion-toggle');
+    const speedButton = $('speed-toggle');
+    function updateSpeedButton() {
+      const rate = playbackRates[playbackRateIndex];
+      const next = playbackRates[(playbackRateIndex + 1) % playbackRates.length];
+      speedButton.textContent = `${rate}×`;
+      speedButton.setAttribute('aria-label', `Playback speed: ${rate}×. Change to ${next}×`);
+      speedButton.title = `Playback speed: ${rate}×. Change to ${next}×`;
+      $('scene').dataset.playbackRate = String(rate);
+    }
     function updateButton() {
       button.dataset.paused = String(paused);
       const label = paused ? 'Play animation' : 'Pause animation';
@@ -1095,7 +1159,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     function tick(now) {
       frame = null;
       if (paused || document.hidden || !visible) { previous = null; return; }
-      if (previous !== null) time += Math.min((now - previous) / 1000, .05);
+      if (previous !== null) time += Math.min((now - previous) / 1000, .05) * playbackRates[playbackRateIndex];
       previous = now;
       const spriteFrame = Math.floor(time * SCOUT_FPS);
       if (spriteFrame !== lastSpriteFrame) { draw(time); lastSpriteFrame = spriteFrame; }
@@ -1109,12 +1173,20 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       updateButton();
     }
     button.addEventListener('click', () => { paused = !paused; sync(); });
+    speedButton.addEventListener('click', () => {
+      playbackRateIndex = (playbackRateIndex + 1) % playbackRates.length;
+      updateSpeedButton();
+      sync();
+    });
     $('story-replay').addEventListener('click', () => { time = 0; paused = false; draw(time); sync(); });
     motionPreference.addEventListener('change', e => { paused = e.matches; sync(); });
     document.addEventListener('visibilitychange', sync);
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(entries => { visible = entries[0].isIntersecting; sync(); }, { threshold: 0 }).observe($('scene'));
     }
+    wideLayout.addEventListener('change', () => { updateLayout(); draw(time); });
+    updateLayout();
+    updateSpeedButton();
     draw(time);
     Promise.all([
       document.fonts.load('20px "VT323"'),
