@@ -10,7 +10,7 @@
   </iframe>
 
   ?embed=1 uses a transparent background with no surrounding padding.
-  The story runs for 40 seconds and loops. &at=32&paused=1 previews a story moment.
+  The story runs for 38.5 seconds and loops. &at=32&paused=1 previews a story moment.
   &controls=0 hides the pause button. &paused=1 starts paused.
   Color and example coefficient settings are in the adapters array below.
   The coefficients are illustrative, not measured model parameters.
@@ -20,6 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>WebMix — Scout, Hypernetwork &amp; Web Agent</title>
+  <link rel="icon" type="image/png" href="social/hypernetwork.png">
   <!-- Embedded VT323 pixel font. License follows:
 Copyright 2011, The VT323 Project Authors (peter.hull@oikoi.com)
 
@@ -390,10 +391,6 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
             <path d="M758 784H986V996H758Z" fill="#5ecce0" opacity=".11"/>
           </g>
           <use href="#web-domain-art" transform="translate(0 1030)"/>
-          <g id="agent-domain-check" opacity="0" shape-rendering="crispEdges">
-            <path d="M940 959H975V994H940Z" fill="#e3f2d9"/>
-            <path d="M947 976H954V983H960V969H967V962" fill="none" stroke="#6b9656" stroke-width="5"/>
-          </g>
           <ellipse id="web-agent-shadow" cx="330" cy="1004" rx="75" ry="7" fill="#6c887b" opacity=".12"/>
           <g id="agent-flight-trail" fill="none" stroke-linecap="round" opacity="0">
             <path stroke="#f58232" stroke-width="5"/>
@@ -468,6 +465,12 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <g id="agent-confidence" opacity="0" shape-rendering="crispEdges">
             <path d="M0 0H8V8H0ZM14-10H20V-4H14ZM27-3H31V1H27Z" fill="#39bacb"/>
           </g>
+          <!-- Keep the completion tick above the agent's beam and across the domain. -->
+          <g id="agent-domain-check" opacity="0" shape-rendering="crispEdges">
+            <title>Task complete</title>
+            <path d="M778 834H966V984H778Z" fill="#fbfcf9" opacity=".8"/>
+            <path d="M804 900H828V912H840V924H852V912H864V900H876V888H888V876H900V864H912V852H936V876H924V888H912V900H900V912H888V924H876V936H864V948H840V936H828V924H816V912H804Z" fill="#268546" stroke="#fbfcf9" stroke-width="8" paint-order="stroke"/>
+          </g>
           <text x="330" y="1032" text-anchor="middle" class="scene-text" font-size="11" font-weight="600" letter-spacing="1.5" fill="#6c8378">WEB AGENT</text>
           <text x="870" y="1020" text-anchor="middle" class="scene-text" font-size="11" font-weight="600" letter-spacing="1.5" fill="#6c8378">WEB DOMAIN</text>
         </g>
@@ -515,7 +518,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     };
     const set = (el, attrs) => { for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value); };
     const TAU = Math.PI * 2;
-    const STORY_DURATION = 40;
+    const STORY_DURATION = 38.5;
+    const RESET_START = STORY_DURATION - 1.6;
+    const AGENT_RESET = RESET_START + .6;
     const clamp = value => Math.max(0, Math.min(1, value));
     const ease = value => { const u = clamp(value); return u * u * (3 - 2 * u); };
     const lerp = (a, b, u) => a + (b - a) * u;
@@ -803,7 +808,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     function storyState(t) {
       const p = ((t % STORY_DURATION) + STORY_DURATION) % STORY_DURATION;
       const mixTime = Math.max(0, Math.min(p, 22.8) - 14.7);
-      const ending = 1 - ease((p - 38.4) / 1.6);
+      const ending = 1 - ease((p - RESET_START) / 1.6);
       const mixAlpha = ease((p - 14.7) / .65) * (1 - ease((p - 22.2) / .6));
       const reading = ease((p - 11.1) / .5) * (1 - ease((p - 13.8) / .7));
       const recipeRead = ease((p - 12.2) / 1.6) * ending;
@@ -822,8 +827,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       else if (p >= 29.1 && p < 30.1) phase = 'agent-integrating';
       else if (p >= 30.1 && p < 33) phase = 'agent-charging';
       else if (p >= 33 && p < 34.6) phase = 'agent-flying';
-      else if (p >= 34.6 && p < 38.4) phase = 'agent-ready';
-      else if (p >= 38.4) phase = 'resetting';
+      else if (p >= 34.6 && p < RESET_START) phase = 'agent-ready';
+      else if (p >= RESET_START) phase = 'resetting';
       return {p, phase, mixTime, mixAlpha, reading, recipeRead, ending};
     }
 
@@ -928,17 +933,17 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     function drawFinalAct(story, palm) {
       const p=story.p;
       const flightProgress=clamp((p-33)/1.6);
-      const travel=p < 39 ? 350*ease(flightProgress) : 0;
+      const travel=p < AGENT_RESET ? 350*ease(flightProgress) : 0;
       const boost=p>=33&&p<34.6?Math.sin(flightProgress*Math.PI):0;
-      const upgraded=ease((p-30.1)/1.0)*(p<39?1:0);
+      const upgraded=ease((p-30.1)/1.0)*(p<AGENT_RESET?1:0);
       const charging=ease((p-30.05)/.3)*(1-ease((p-32.6)/.4));
       // Fold the original hand up to the chin, then unfold it before the battery arrives.
-      const thinking=p>=39?1:1-ease((p-26.3)/1.1);
+      const thinking=p>=AGENT_RESET?1:1-ease((p-26.3)/1.1);
       const steadyHands=p>=26.3&&p<30.5;
-      const flightLift=p<33||p>=39?0:16*ease(flightProgress)+boost*20;
+      const flightLift=p<33||p>=AGENT_RESET?0:16*ease(flightProgress)+boost*20;
       const bob=(steadyHands?0:Math.sin(p*2)*3)-upgraded*6-flightLift;
       const pitch=(p<33?-4*ease((p-32.6)/.4):p<34.6?boost*18:upgraded*2)+thinking*(-3+Math.sin(p*1.15)*1.4);
-      const actorOpacity=p<38.4?1:p<39?1-ease((p-38.4)/.6):ease((p-39)/.8);
+      const actorOpacity=p<RESET_START?1:p<AGENT_RESET?1-ease((p-RESET_START)/.6):ease((p-AGENT_RESET)/.8);
       set($('web-agent-motion'), {transform:`translate(${AGENT_ORIGIN[0]+travel} ${AGENT_ORIGIN[1]+bob})`, opacity:actorOpacity});
       $('web-agent-motion').dataset.upgraded=String(upgraded>.95);
       $('web-agent-motion').dataset.expression=upgraded>.8?'serious':thinking>.5?'confused':'attentive';
@@ -999,7 +1004,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         scale=lerp(1,.42,u);opacity=1;owner='integrating';
       } else if(p>=30.1&&p<30.5) {
         position=agentCore;scale=.42;opacity=1-ease((p-30.1)/.4);owner='integrated';
-      } else if(p>=30.5&&p<39) owner='integrated';
+      } else if(p>=30.5&&p<AGENT_RESET) owner='integrated';
       set($('mixed-module'), {transform:`translate(${snap(position[0])} ${snap(position[1])}) scale(${scale})`,opacity});
       $('mixed-module').dataset.owner=owner;
       set($('module-handoff-route'), {opacity:p>=26.3&&p<28.5?Math.sin((p-26.3)/2.2*Math.PI)*.6:0});
