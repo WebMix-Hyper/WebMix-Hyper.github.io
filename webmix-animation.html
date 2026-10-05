@@ -535,9 +535,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     const lerp = (a, b, u) => a + (b - a) * u;
     const lastStoryState = { phase: '' };
     const wideLayout = matchMedia('(min-width: 960px)');
-    const stageOffsets = { scout: [0, 610], hyper: [960, 60], agent: [1920, -400] };
+    const stageOffsets = { scout: [0, 610], hyper: [880, 60], agent: [1740, -400] };
     const stagePoint = (stage, point) => point.map((value, i) => value + (wideLayout.matches ? stageOffsets[stage][i] : 0));
-    const widePaperRoute = [[381, 502], [720, 230], [1323, 215], [1443, 395]];
+    const widePaperRoute = [[381, 502], [720, 230], [1243, 215], [1363, 395]];
     const PIXEL = 4;
     const POT_PIXEL = 5;
     const CHARACTER_PIXEL = 4;
@@ -957,7 +957,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
     function updateLayout() {
       const wide = wideLayout.matches;
-      set($('scene'), {viewBox:wide ? '100 0 2880 720' : '100 -360 960 1440'});
+      set($('scene'), {viewBox:wide ? '140 0 2640 720' : '100 -360 960 1440'});
       $('scene').dataset.layout = wide ? 'wide' : 'stacked';
       for (const [stage, offset] of Object.entries(stageOffsets)) {
         set($(`${stage}-stage`), {transform:wide ? `translate(${offset})` : ''});
