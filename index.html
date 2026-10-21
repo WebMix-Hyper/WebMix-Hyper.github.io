@@ -26,6 +26,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css?family=Google+Sans:400,500,700%7CNoto+Sans:400,600,700&display=swap" rel="stylesheet">
   <style>
+    @font-face {
+      font-family: "VT323";
+      src: url("fonts/VT323-Regular.ttf") format("truetype");
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+    }
+
     /* A minimal adaptation of the Nerfies research project page layout.
        Template: https://nerfies.github.io/ (CC BY-SA 4.0). */
     :root {
@@ -136,6 +144,170 @@
       background: #fafbf8;
     }
 
+    .paper-section {
+      max-width: 1008px;
+      margin: 0 auto;
+      padding: 0 24px 52px;
+    }
+
+    .section-title {
+      margin: 0 0 18px;
+      color: #363636;
+      font-family: "Google Sans", "Noto Sans", Arial, sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .results-summary {
+      max-width: 780px;
+      margin: 0 auto 26px;
+      font-size: 16px;
+      line-height: 1.75;
+      text-align: center;
+      text-wrap: pretty;
+    }
+
+    .results-figure {
+      --results-ink: #233f43;
+      --results-teal: #299ba2;
+      margin: 0;
+      padding: 24px;
+      border: 1px solid #e1e8df;
+      border-radius: 12px;
+      background: #fafbf8;
+      color: var(--results-ink);
+    }
+    .setting-button:focus-visible,
+    .citation-code:focus-visible,
+    .copy-citation:focus-visible { outline: 3px solid #209cee; outline-offset: 4px; }
+
+    .results-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      color: var(--results-ink);
+      font-family: "VT323", monospace;
+      font-size: 22px;
+    }
+
+    .results-settings { display: flex; gap: 10px; }
+    .results-settings[hidden] { display: none; }
+    .setting-button {
+      padding: 7px 12px;
+      border: 2px solid #d7e2d9;
+      border-radius: 0;
+      box-shadow: 3px 3px 0 #e4ebe1;
+      background: #fff;
+      color: #5b746d;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .setting-button[aria-pressed="true"] { border-color: #365a54; background: #e1f1e8; color: #233f43; box-shadow: 3px 3px 0 #9ebcb0; }
+    .setting-button:hover { background: #edf5ec; }
+    .results-legend { display: flex; flex-wrap: wrap; gap: 16px; }
+    .results-legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .results-legend strong { font-weight: 400; }
+    .legend-swatch { width: 18px; height: 14px; border: 2px solid #8fa49b; background: #dce5df; box-shadow: inset 0 2px #f4f7f1; }
+    .legend-swatch.webmix { border-color: #205b70; background: var(--results-teal); box-shadow: inset 0 2px #a4e4d8; }
+    .results-charts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .benchmark-figure {
+      --panel-accent: #299ba2;
+      --panel-pale: #d7f4ef;
+      margin: 0;
+      min-width: 0;
+      padding: 14px 12px 8px;
+      border: 2px solid #cfddd5;
+      background: #fff;
+      box-shadow: 4px 4px 0 #e5ece2;
+    }
+
+    .benchmark-figure:nth-child(2) { --panel-accent: #8f631e; --panel-pale: #fff0b9; }
+    .benchmark-figure:nth-child(3) { --panel-accent: #524477; --panel-pale: #eae1ff; }
+    .benchmark-title {
+      margin: 0 0 8px;
+      color: #365a54;
+      font-family: "VT323", monospace;
+      font-size: 27px;
+      font-weight: 400;
+      line-height: 1.1;
+      text-align: center;
+    }
+
+    .benchmark-title .benchmark-index {
+      display: table;
+      margin: 0 auto 10px;
+      padding: 3px 9px;
+      border: 2px solid var(--panel-accent);
+      background: var(--panel-pale);
+      color: var(--panel-accent);
+      box-shadow: 2px 2px 0 var(--panel-pale);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .benchmark-title .benchmark-subtitle { display: block; margin-top: 4px; color: #647c74; font-size: 19px; }
+    .benchmark-chart { display: block; width: 100%; height: auto; overflow: visible; }
+    .benchmark-chart text { font-family: "VT323", monospace; fill: #233f43; font-size: 20px; font-weight: 400; }
+    .benchmark-chart .grid-line { stroke: #dce6dd; stroke-width: 1; stroke-dasharray: 2 5; }
+    .benchmark-chart .axis-line { stroke: #92a99d; stroke-width: 1; }
+    .benchmark-chart .baseline-bar { fill: #dce5df; stroke: #8fa49b; stroke-width: 1.5; }
+    .benchmark-chart .webmix-bar { fill: #299ba2; stroke: #205b70; stroke-width: 1.5; }
+    .benchmark-chart .bar-highlight { stroke-width: 3; stroke-linecap: butt; }
+    .benchmark-chart .baseline-highlight { stroke: #f4f7f1; }
+    .benchmark-chart .webmix-highlight { stroke: #a4e4d8; }
+    .benchmark-chart .bar-fill { shape-rendering: crispEdges; transform-box: fill-box; transform-origin: left center; }
+    .results-figure.is-visible .bar-fill { animation: fill-result .6s steps(12, end) both; }
+    .benchmark-chart .webmix-value { fill: #205b70; }
+    .benchmark-chart .gain { fill: #338b88; font-size: 19px; }
+    .benchmark-chart .tick-label { fill: #647c74; font-size: 16px; }
+
+    @keyframes fill-result {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    .citation-heading {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .citation-heading .section-title { margin: 0; text-align: left; }
+    .citation-actions { display: flex; align-items: center; gap: 14px; font-size: 14px; }
+    .copy-citation {
+      padding: 8px 13px;
+      border: 1px solid #d5d5d5;
+      border-radius: 6px;
+      background: #fff;
+      color: #363636;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .copy-citation:hover { background: #f2f2f2; }
+    .copy-citation[hidden] { display: none; }
+    .citation-code {
+      margin: 0;
+      padding: 22px 24px;
+      overflow-x: auto;
+      background: #f5f5f5;
+      color: #363636;
+      font-size: 13px;
+      line-height: 1.65;
+      tab-size: 2;
+    }
+
+    .citation-code code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .citation-status { min-height: 1.5em; margin: 8px 0 0; font-size: 13px; }
+
     .footer {
       padding: 28px 24px;
       background: #fafafa;
@@ -154,6 +326,11 @@
       }
     }
 
+    @media (max-width: 760px) {
+      .results-charts { grid-template-columns: 1fr; gap: 28px; max-width: 400px; margin: 0 auto; }
+      .results-toolbar { justify-content: center; }
+    }
+
     @media (max-width: 600px) {
       .publication-header { padding: 36px 20px 28px; }
       .publication-title { margin-bottom: 22px; letter-spacing: -.75px; }
@@ -163,6 +340,13 @@
       .motivation { padding: 0 12px 24px; }
       .motivation-box { padding: 18px 20px; font-size: 15px; }
       .teaser { padding: 0 12px 32px; }
+      .paper-section { padding: 0 20px 36px; }
+      .section-title { font-size: 26px; }
+      .results-summary { font-size: 15px; text-align: left; }
+      .results-figure { padding: 18px 14px; }
+      .results-toolbar { font-size: 21px; }
+      .setting-button { padding: 7px 10px; }
+      .citation-code { padding: 16px; font-size: 12px; }
       .animation iframe {
         height: min(calc((100vw - 24px) * 1.5 + 56px), calc(100svh - 24px));
         border-radius: 8px;
@@ -171,6 +355,7 @@
 
     @media (prefers-reduced-motion: reduce) {
       .publication-link { transition: none; }
+      .results-figure.is-visible .bar-fill { animation: none; }
     }
   </style>
 </head>
@@ -212,10 +397,149 @@
         </iframe>
       </figure>
     </section>
+
+    <section class="paper-section" id="results" aria-labelledby="results-title">
+      <h2 class="section-title" id="results-title">Results</h2>
+      <p class="results-summary">WebMix improves success across domains and versions, on both unseen and seen interfaces.</p>
+      <figure class="results-figure">
+        <div class="results-toolbar">
+          <div class="results-settings" role="group" aria-label="Evaluation setting" hidden>
+            <button class="setting-button" type="button" data-setting="unseen" aria-pressed="true">Unseen interfaces</button>
+            <button class="setting-button" type="button" data-setting="seen" aria-pressed="false">Seen interfaces</button>
+          </div>
+          <div class="results-legend" aria-label="Chart legend">
+            <span><i class="legend-swatch" aria-hidden="true"></i>Best baseline</span>
+            <span><i class="legend-swatch webmix" aria-hidden="true"></i><strong>WebMix</strong></span>
+          </div>
+        </div>
+        <div class="results-charts" id="results-charts">
+          <figure class="benchmark-figure">
+            <h3 class="benchmark-title"><span class="benchmark-index" aria-hidden="true">01</span>TimeWarp<span class="benchmark-subtitle">Domains</span></h3>
+            <svg class="benchmark-chart" viewBox="0 0 300 282" role="img" aria-labelledby="domains-title domains-description"></svg>
+          </figure>
+          <figure class="benchmark-figure">
+            <h3 class="benchmark-title"><span class="benchmark-index" aria-hidden="true">02</span>TimeWarp<span class="benchmark-subtitle">Versions</span></h3>
+            <svg class="benchmark-chart" viewBox="0 0 300 282" role="img" aria-labelledby="versions-title versions-description"></svg>
+          </figure>
+          <figure class="benchmark-figure">
+            <h3 class="benchmark-title"><span class="benchmark-index" aria-hidden="true">03</span>WebArena-Lite-v2<span class="benchmark-subtitle">Domains</span></h3>
+            <svg class="benchmark-chart" viewBox="0 0 300 282" role="img" aria-labelledby="webarena-title webarena-description"></svg>
+          </figure>
+        </div>
+        <noscript><p>View the benchmark results in <a href="https://arxiv.org/html/2610.22539v1#S4.T1">the paper’s results tables</a>. Enable JavaScript to explore the charts.</p></noscript>
+      </figure>
+    </section>
+
+    <section class="paper-section" id="citation" aria-labelledby="citation-title">
+      <div class="citation-heading">
+        <h2 class="section-title" id="citation-title">Citation</h2>
+        <div class="citation-actions">
+          <a href="https://arxiv.org/abs/2610.22539">arXiv:2610.22539</a>
+          <button class="copy-citation" id="copy-citation" type="button" hidden>Copy BibTeX</button>
+        </div>
+      </div>
+      <pre class="citation-code" tabindex="0" aria-label="WebMix BibTeX citation"><code id="bibtex">@misc{ishmam2026dontretrainremixadaptation,
+  title={Don't Retrain, Remix: Adaptation of Web Agents using Mixture Hypernetworks},
+  author={Md Farhan Ishmam and Minh Pham Dinh and Kenneth Marino},
+  year={2026},
+  eprint={2610.22539},
+  archivePrefix={arXiv},
+  primaryClass={cs.LG},
+  url={https://arxiv.org/abs/2610.22539},
+}</code></pre>
+      <p class="citation-status" id="citation-status" role="status"></p>
+    </section>
   </main>
 
   <footer class="footer">
     <p>Website template adapted from <a href="https://nerfies.github.io/">Nerfies</a>, licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
   </footer>
+  <script>
+    // Each pair is [best baseline, WebMix], ordered Qwen-3.5 4B, Llama-3.1 8B.
+    // Aggregate success rates from the paper's Tables 1 and 2.
+    const benchmarkResults = [
+      {id: 'domains', name: 'TimeWarp domains', unseen: [[25.42, 33.75], [8.33, 15.83]], seen: [[34.17, 40.42], [16.25, 20.83]]},
+      {id: 'versions', name: 'TimeWarp versions', unseen: [[24.27, 27.51], [16.99, 18.77]], seen: [[25.57, 28.00], [18.93, 20.71]]},
+      {id: 'webarena', name: 'WebArena-Lite-v2', unseen: [[29.22, 34.42], [12.12, 16.67]], seen: [[38.10, 42.42], [23.59, 26.19]]}
+    ];
+    const resultModels = ['Qwen-3.5 4B', 'Llama-3.1 8B'];
+    const resultCharts = document.querySelectorAll('.benchmark-chart');
+    const settingButtons = document.querySelectorAll('.setting-button');
+
+    function renderResults(setting) {
+      const settingLabel = setting === 'unseen' ? 'Unseen interfaces' : 'Seen interfaces';
+      benchmarkResults.forEach((benchmark, index) => {
+        const pairs = benchmark[setting];
+        const description = pairs.map(([baseline, webmix], model) =>
+          `${resultModels[model]}: best baseline ${baseline.toFixed(2)}%, WebMix ${webmix.toFixed(2)}%, a gain of ${(webmix - baseline).toFixed(2)} percentage points.`
+        ).join(' ');
+        // A common zero-based 0–50% axis keeps all benchmarks and settings comparable.
+        const x = value => 8 + value / 50 * 250;
+        // Stepped corners and a light upper edge echo the animation's adapter tiles.
+        // The rightmost edge still represents the exact score on the shared axis.
+        const bar = (value, top, kind) => `
+          <g class="bar-fill">
+            <path class="${kind}-bar" d="M11 ${top}H${x(value) - 3}V${top + 3}H${x(value)}V${top + 17}H${x(value) - 3}V${top + 20}H11V${top + 17}H8V${top + 3}H11Z"/>
+            <path class="bar-highlight ${kind}-highlight" d="M12 ${top + 4}H${x(value) - 4}"/>
+          </g>`;
+        resultCharts[index].innerHTML = `
+          <title id="${benchmark.id}-title">${benchmark.name} — ${settingLabel}</title>
+          <desc id="${benchmark.id}-description">${description}</desc>
+          ${[0, 10, 20, 30, 40, 50].map(value => `
+            <path class="grid-line" d="M${x(value)} 34V222"/>
+            <text class="tick-label" x="${x(value)}" y="242" text-anchor="middle">${value}</text>
+          `).join('')}
+          ${pairs.map(([baseline, webmix], model) => {
+            const top = 50 + model * 106;
+            return `
+              <rect x="0" y="${top - 38}" width="300" height="24" fill="white"/>
+              <text x="8" y="${top - 20}">${resultModels[model]}</text>
+              <text class="gain" x="291" y="${top - 20}" text-anchor="end">+${(webmix - baseline).toFixed(2)} pp</text>
+              ${bar(baseline, top, 'baseline')}
+              <text x="${x(baseline) + 6}" y="${top + 15}">${baseline.toFixed(2)}</text>
+              ${bar(webmix, top + 27, 'webmix')}
+              <text class="webmix-value" x="${x(webmix) + 6}" y="${top + 42}">${webmix.toFixed(2)}</text>
+            `;
+          }).join('')}
+          <path class="axis-line" d="M8 222H258"/>
+          <text x="133" y="269" text-anchor="middle">Success rate (%) ↑</text>`;
+      });
+      settingButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.setting === setting)));
+    }
+
+    settingButtons.forEach(button => button.addEventListener('click', () => renderResults(button.dataset.setting)));
+    renderResults('unseen');
+    document.querySelector('.results-settings').hidden = false;
+    const resultsFigure = document.querySelector('.results-figure');
+    if ('IntersectionObserver' in window) {
+      const resultsObserver = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+          resultsFigure.classList.add('is-visible');
+          resultsObserver.disconnect();
+        }
+      }, {threshold: .1});
+      resultsObserver.observe(resultsFigure);
+    } else {
+      resultsFigure.classList.add('is-visible');
+    }
+
+    const copyCitation = document.getElementById('copy-citation');
+    copyCitation.hidden = false;
+    copyCitation.addEventListener('click', async () => {
+      const citation = document.getElementById('bibtex');
+      const status = document.getElementById('citation-status');
+      try {
+        await navigator.clipboard.writeText(citation.textContent);
+        status.textContent = 'BibTeX copied to clipboard.';
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(citation);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        status.textContent = 'Citation selected. Press Ctrl+C or ⌘C to copy.';
+      }
+    });
+  </script>
 </body>
 </html>

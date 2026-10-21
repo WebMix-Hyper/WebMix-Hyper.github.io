@@ -10,8 +10,8 @@
   </iframe>
 
   ?embed=1 uses a transparent background with no surrounding padding.
-  The story spans 38.5 seconds, playing at 1.25x by default (a 30.8-second loop).
-  The speed button cycles through 1.25x, 2x, and 4x.
+  The story spans 38.5 seconds, playing at an internal rate of 1.25 by default
+  (a 30.8-second loop), labeled 1x. The speed button labels are 1x, 2x, and 4x.
   &at=32&paused=1 previews a story moment; &controls=0 hides the controls.
   Color and example coefficient settings are in the adapters array below.
   The coefficients are illustrative, not measured model parameters.
@@ -496,7 +496,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         </g>
       </svg>
       <div class="controls">
-        <button id="speed-toggle" type="button" aria-label="Playback speed: 1.25×. Change to 2×" title="Playback speed: 1.25×. Change to 2×">1.25×</button>
+        <button id="speed-toggle" type="button" aria-label="Playback speed: 1×. Change to 2×" title="Playback speed: 1×. Change to 2×">1×</button>
         <button id="story-replay" type="button" aria-label="Replay the Scout story" title="Replay the Scout story">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 4a5 5 0 1 1-1 5M4 1v4H0"/></svg>
         </button>
@@ -1136,18 +1136,19 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     }
 
     const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
-    const playbackRates = [1.25, 2, 4];
+    // Display the preferred default pace as 1× without changing the animation timing.
+    const playbackSpeeds = [{rate: 1.25, label: '1×'}, {rate: 2, label: '2×'}, {rate: 4, label: '4×'}];
     let playbackRateIndex = 0;
     let paused = motionPreference.matches || params.get('paused') === '1';
     let visible = true, frame = null, time = Math.max(0, Number(params.get('at')) || 0) % STORY_DURATION, previous = null, lastSpriteFrame = -1;
     const button = $('motion-toggle');
     const speedButton = $('speed-toggle');
     function updateSpeedButton() {
-      const rate = playbackRates[playbackRateIndex];
-      const next = playbackRates[(playbackRateIndex + 1) % playbackRates.length];
-      speedButton.textContent = `${rate}×`;
-      speedButton.setAttribute('aria-label', `Playback speed: ${rate}×. Change to ${next}×`);
-      speedButton.title = `Playback speed: ${rate}×. Change to ${next}×`;
+      const {rate, label} = playbackSpeeds[playbackRateIndex];
+      const next = playbackSpeeds[(playbackRateIndex + 1) % playbackSpeeds.length].label;
+      speedButton.textContent = label;
+      speedButton.setAttribute('aria-label', `Playback speed: ${label}. Change to ${next}`);
+      speedButton.title = `Playback speed: ${label}. Change to ${next}`;
       $('scene').dataset.playbackRate = String(rate);
     }
     function updateButton() {
@@ -1159,7 +1160,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     function tick(now) {
       frame = null;
       if (paused || document.hidden || !visible) { previous = null; return; }
-      if (previous !== null) time += Math.min((now - previous) / 1000, .05) * playbackRates[playbackRateIndex];
+      if (previous !== null) time += Math.min((now - previous) / 1000, .05) * playbackSpeeds[playbackRateIndex].rate;
       previous = now;
       const spriteFrame = Math.floor(time * SCOUT_FPS);
       if (spriteFrame !== lastSpriteFrame) { draw(time); lastSpriteFrame = spriteFrame; }
@@ -1174,7 +1175,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     }
     button.addEventListener('click', () => { paused = !paused; sync(); });
     speedButton.addEventListener('click', () => {
-      playbackRateIndex = (playbackRateIndex + 1) % playbackRates.length;
+      playbackRateIndex = (playbackRateIndex + 1) % playbackSpeeds.length;
       updateSpeedButton();
       sync();
     });
